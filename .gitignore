@@ -1,0 +1,9 @@
+Debug/
+Release/
+*.sln
+*.sdf
+*.opensdf
+MOEADKF.v11.suo
+Evaluation/Debug/
+Evaluation/Release/
+*.dat
