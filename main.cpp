@@ -5,21 +5,25 @@ void stateAverage();
 void fun(std::vector< double >& F, std::vector< double >& X,double T);
 void readata(char *filename, vector< vector<double>> &pf);
 double angle();
+
+void DF10();
+void DF9();
+
 int main()
 {
-	
-	/*std::vector<vector<double>> pf;
-	std::vector<double> f(2);
-	char pfname[1024];
-	sprintf(pfname,"news/%s.dat","jy3");
-	readata(pfname,pf);
-	fun(f,pf[0],0.6);*/
-	stateAverage();
-	//angle();
-	//average();
-	/*char    str[256]="gd.txt";
-	eva.loads(str,eva.pf,12);	
-	eva.readToScience(eva.pf,"gd_scien.dat");*/
+	 DF10();
+	//std::vector<vector<double>> pf;
+	//std::vector<double> f(2);
+	//char pfname[1024];
+	//sprintf(pfname,"news/%s.dat","jy3");
+	//readata(pfname,pf);
+	//fun(f,pf[0],0.6);
+	//stateAverage();
+	////angle();
+	////average();
+	//char    str[256]="gd.txt";
+	////eva.loads(str,eva.pf,12);	
+	////eva.readToScience(eva.pf,"gd_scien.dat");
 	
 	return 0;
 }
@@ -36,6 +40,7 @@ double angle(){
 	cout<<angles;
 	return angles;
 }
+
 void readata(char *filename, vector< vector<double>> &pf){
 	std::fstream fin;
 	int line=0;
@@ -91,7 +96,6 @@ void fun(std::vector< double >& F, std::vector< double >& X,double T){
 	F[0] = (1 + sum1)*(X[0] + a*sin(w*PI*X[0]));
 	F[1] = (1 + sum1)*(1 - X[0] + a*sin(w*PI*X[0]));
 }
-
 
 void average(){
 
@@ -654,3 +658,66 @@ void stateAverage(){
 	}
 }
 
+
+void DF10(){
+
+	char  filename[1024];
+	double rate=0.02;
+	double nt;
+	int j;
+	nt=10.0;
+	for(j=0;j<=120;j++){
+		std::ofstream pfile;
+		sprintf(filename,"news/pf_%s_%d.dat","DF10",j);
+
+		pfile.open(filename,ios::out);		
+		double Ht = 0, Nt = 0;		
+		Ht = 2.25 + 2*cos(0.5*PI*j/nt); 
+		
+		for(int x1 = 0; x1 < 100; x1++){
+			for(int x2 = 0; x2 <100;x2++){
+				double x11 = (double)x1/99;
+				double x22 = (double)x2/99;
+				std::cout<<pow(sin(0.5*PI*x11),Ht)<<"    "<<pow(sin(0.5*PI*x22)*cos(0.5*PI*x11),Ht)
+					<<"    "<<pow(cos(0.5*PI*x22)*cos(0.5*PI*x11),Ht)<<"\n";
+
+				pfile<<pow(sin(0.5*PI*x11),Ht)<<"    "<<pow(sin(0.5*PI*x22)*cos(0.5*PI*x11),Ht)
+					<<"    "<<pow(cos(0.5*PI*x22)*cos(0.5*PI*x11),Ht)<<"\n";
+				//if(x1==0)break;
+			}
+		}
+		pfile.close();
+	}
+
+} 
+
+void DF9(){
+
+	char  filename[1024];
+	double rate=0.02;
+	double x=0,wt,nt;
+	int j;
+	nt=10.0;
+	for(j=0;j<=120;j++){
+		std::ofstream pfile;
+		sprintf(filename,"news/pf_%s_%d.dat","DF9",j);
+
+		pfile.open(filename,ios::out);		
+		double max = 0, Nt = 0;		
+		Nt = 1 + floor(10*abs(sin(0.5*PI*j/nt)));
+		
+		x = 0;
+		while(x <= 1.002){
+			max = (1/(2.0*Nt)+0.1)*sin(2*Nt*PI*x);
+
+			if(max<0)
+				max=0;
+
+			pfile<<x + max<<"    "<<setprecision(8)<<1 - x + max<<"\n";
+			x+=0.002;
+		}
+		
+		pfile.close();
+	}
+
+} 
