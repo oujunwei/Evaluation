@@ -51,7 +51,7 @@ public:
 
 
 	void GetAvgIGD(char * problem,int run,int gener);
-	void Statistics(char * problem,int metrics,int run);//统计数据
+	void Statistics(char * problem[],int testNumber,int metrics,int precise,int run);//统计数据
 	
 	void loads(char *filename, vector< vector<double>> &pf, int nobj);
 	void readToScience(vector< vector<double>> &pf,char * name);
@@ -419,7 +419,7 @@ double evaluate::pfhv(string instances,int gen,int nt)
 		thv= chv - phv;
 		double gts=fabs(sin(0.5*PI*t))+1+0.5;		
 
-	}else if(instances == "FDA4" || instances == "FDA4"|| instances == "DMOPD")
+	}else if(instances == "FDA4" || instances == "DMOPD")
 	{
 		chv=probreference[0]*probreference[1]*probreference[2];
 		phv = (1.0/8)*4.0*PI / 3;
@@ -703,7 +703,7 @@ void evaluate::GetAvgIGD(char * problem,int run,int predict){
 	pf.open(avgIGD,ios::trunc);
 
 
-	for(int ccc=0;ccc<run;ccc++){//样本均值	
+	for(int ccc=1;ccc<=run;ccc++){//样本均值	
 		sprintf(strTest,"evaluate/data/%s_%d.dat",problem,ccc);
 		vector <double>  igds;
 		loadIGD(strTest,igds,4);
@@ -719,29 +719,34 @@ void evaluate::GetAvgIGD(char * problem,int run,int predict){
 	pf.close();
 }
 
-void evaluate::Statistics(char * problem,int metrics,int run){
+void evaluate::Statistics(char * problem[],int testNumber,int metrics,int precise,int run){
 	std::ofstream pf;
 	char files[1024];
-	char readProblem[1024];
-	sprintf(readProblem,"evaluate/avg/%s.dat",problem);
-	vector<vector<double>> datas;
-	loadpfront(readProblem,datas,metrics);
-	datas.erase(datas.begin(),datas.begin()+run);
-	pf<<setprecision(4)<<setiosflags(ios::scientific);
+	
 	for(int i=0;i<metrics;i++){
-		if(i==0)
-		sprintf(files,"evaluate/statistics/%s.dat","GD");
-		else if(i==1)
-			sprintf(files,"evaluate/statistics/%s.dat","IGD");
-		else if(i==2)
-			sprintf(files,"evaluate/statistics/%s.dat","SP");
-		else if(i==3)
-			sprintf(files,"evaluate/statistics/%s.dat","MS");
-		else if(i==4)
-			sprintf(files,"evaluate/statistics/%s.dat","HV");
-		pf.open(files,ios::app);
-		pf<<problem<<"   "<<datas[0][i]<<"     "<<datas[1][i]<<" "<<"\n";
+			
+			pf<<setprecision(precise)<<setiosflags(ios::scientific);
+			if(i==0)
+				sprintf(files,"evaluate/statistics/%s.dat","GD");
+			else if(i==1)
+				sprintf(files,"evaluate/statistics/%s.dat","IGD");
+			else if(i==2)
+				sprintf(files,"evaluate/statistics/%s.dat","SP");
+			else if(i==3)
+				sprintf(files,"evaluate/statistics/%s.dat","MS");
+			else if(i==4)
+				sprintf(files,"evaluate/statistics/%s.dat","HV");
+			pf.open(files,ios::trunc);
 
+		for(int j=0;j<testNumber;j++){
+			char readProblem[1024];
+			sprintf(readProblem,"evaluate/avg/%s.dat",problem[j]);
+			vector<vector<double>> datas;
+			loadpfront(readProblem,datas,metrics);
+			datas.erase(datas.begin(),datas.begin()+run);
+			
+			pf<<problem[j]<<"   "<<datas[0][i]<<"     "<<datas[1][i]<<" "<<"\n";
+		}
 		pf.close();
 	}	
 }
@@ -767,7 +772,7 @@ void evaluate::getPOF(char * problem, int nt,int gen,vector< vector<double>> &pf
 			double gt=fabs(sin(0.5*PI*t));
 			data.push_back(pow(x,ft));
 			data.push_back((1-sqrt(pow(x,ft)/(1+gt)))*(1+gt));
-		}else if(problem == "FDA4" || problem == "FDA5" || problem =="DMOPF"){ //取 1000个点
+		}else if(problem == "FDA4"  || problem =="F8"){ //取 1000个点
 			int i,j;
 			for(i=0;i<100;i++){
 				for(j=0;j<100;j++){
@@ -778,19 +783,36 @@ void evaluate::getPOF(char * problem, int nt,int gen,vector< vector<double>> &pf
 					data.push_back(cos(theta*PI/2));
 					pf.push_back(data);
 					data.clear();
+					if(i==0)break;
 				}
 			}
 			return;
-		}else if(problem == "DMOP1"){
+		}else if(problem == "FDA5" || problem == "FDA5iso"||problem == "FDA5dec"){ //取 1000个点
+			int i,j;
+			double gt=abs(sin(0.5*PI*t));
+			for(i=0;i<100;i++){
+				for(j=0;j<100;j++){
+					double theta=(double)i/99;
+					double varphi=(double)j/99;
+					data.push_back((1+gt)*sin(theta*PI/2)*cos(varphi*PI/2));
+					data.push_back((1+gt)*sin(theta*PI/2)*sin(varphi*PI/2));
+					data.push_back((1+gt)*cos(theta*PI/2));
+					pf.push_back(data);
+					data.clear();
+					if(i==0)break;
+				}
+			}
+			return;
+		}else if(problem == "DMOP1"|| problem == "dMOP1"){
 			double h=1.25+0.75*sin(0.5*PI*t);
 			data.push_back(x);
 			data.push_back(1-pow(x,h));
-		}else if(problem == "DMOP2")
+		}else if(problem == "DMOP2" || problem == "dMOP2")
 		{
 			double h=1.25+0.75*sin(0.5*PI*t);
 			data.push_back(x);
 			data.push_back(1-pow(x,h));
-		}else if(problem == "DMOP3"){
+		}else if(problem == "DMOP3" || problem == "dMOP3" ){
 			data.push_back(x);
 			data.push_back(1-sqrt(x));
 		}
@@ -889,7 +911,7 @@ void evaluate::getPOF(char * problem, int nt,int gen,vector< vector<double>> &pf
 		
 		}
 		pf.push_back(data);
-		x+=0.002;
+		x+=0.001;
 	}
 	if(problem=="JY4" ){
 		nodominate(pf);

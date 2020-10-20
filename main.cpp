@@ -11,7 +11,7 @@ void DF9();
 
 int main()
 {
-	 DF10();
+	 //DF10();
 	//std::vector<vector<double>> pf;
 	//std::vector<double> f(2);
 	//char pfname[1024];
@@ -20,7 +20,9 @@ int main()
 	//fun(f,pf[0],0.6);
 	//stateAverage();
 	////angle();
-	////average();
+	
+	average();
+
 	//char    str[256]="gd.txt";
 	////eva.loads(str,eva.pf,12);	
 	////eva.readToScience(eva.pf,"gd_scien.dat");
@@ -99,21 +101,21 @@ void fun(std::vector< double >& F, std::vector< double >& X,double T){
 
 void average(){
 
-	int ccc=0;
+	int ccc=1;
 	int nt=10;//环境变化强度
-	int run=20;    //独立运行次数
-	int predict=120; //预测代数
-	int metrics=4; //指标数
-	int testNumber=17;//测试函数个数
-
+	int run=10;    //独立运行次数
+	int predict=50; //预测代数
+	int metrics=5; //指标数
+	int testNumber=1;//测试函数个数
+	int precise = 3;  //精确度
 	std::ofstream pf;
 	std::ofstream sta;
 
-	//char* instances[]  = {"FDA1","FDA2","FDA3","FDA4","DMOP1","DMOP2","DMOP3","DMOPA","DMOPB","DMOPC","DMOPD","DMOPE","JY1","JY2","JY3","JY4","JY5","JY6","JY7","JY8","JY9","FDA4","DMOPF"}; // names of test instances
+	//char* instances[]  = {"FDA1","FDA4","JY1","JY2","JY3","JY4","JY5","JY6","JY7","JY8","JY9"}; // names of test instances
 	
-	char* instances[]  = {"FDA1","FDA2","FDA3","FDA4","FDA5","DMOP1","DMOP2","DMOP3","JY1","JY2","JY3","JY4","JY5","JY6","JY7","JY8","JY9"}; // names of test instances
+	char* instances[]  = {"FDA4","FDA1","FDA2","FDA3","dMOP1","dMOP2","dMOP3","JY1","JY2","JY3","JY4","JY5","JY6","JY7","JY8","JY9"}; // names of test instances
 	
-	while(ccc<0)
+	while(ccc<=run)
 	{
 		evaluate eva;
 		
@@ -155,7 +157,7 @@ void average(){
 				pf.close();
 			}
 		
-			if (instances[i]=="FDA1"||instances[i]=="FDA2"||instances[i]=="FDA3"||instances[i]=="DMOP1"||instances[i]=="DMOP2"||instances[i]=="DMOP3"||
+			if (instances[i]=="FDA1"||instances[i]=="FDA2"||instances[i]=="FDA3"||instances[i]=="dMOP1"||instances[i]=="dMOP2"||instances[i]=="dMOP3"||
 				instances[i]=="DMOPA"||instances[i]=="DMOPB"||instances[i]=="DMOPC"||instances[i]=="DMOPD"||instances[i]=="DMOPE")
 			{
 				char pfname[1024];
@@ -241,7 +243,7 @@ void average(){
 		cout<<instances[kkk]<<endl;
 
 		pf<<setprecision(5)<<setiosflags(ios::scientific);
-		for(ccc=0;ccc<run;ccc++){     //每次独立运行的求平均
+		for(ccc=1;ccc<=run;ccc++){     //每次独立运行的求平均
 			sprintf(strTestInstance,"evaluate/data/%s_%d.dat",instances[kkk],ccc);
 			eva.loadpfront(strTestInstance,eva.pf,metrics);
 			eva.indicator_AVG(eva.pf,eva.in_avg);
@@ -277,8 +279,9 @@ void average(){
 
 		//求平均IGD
 		eva.GetAvgIGD(instances[kkk],run,predict);
-		eva.Statistics(instances[kkk],metrics,run);//统计数据
+		
 	}
+	eva.Statistics(instances,testNumber,metrics,precise,run);//统计数据
 }
 
 void stateAverage(){
