@@ -119,12 +119,12 @@ double evaluate::indicator_MS(vector<vector<double>> v1, vector<vector<double>> 
 	vector<double> v2_max(nobj, -1.0e+30), v2_min(nobj, 1.0e+30);
 	for (int n = 0; n < nobj; n++)
 	{
-		for (int i = 0; i < v1.size(); i++)
+		for (unsigned int i = 0; i < v1.size(); i++)
 		{
 			if (v1_max[n] < v1[i][n]) v1_max[n] = v1[i][n];
 			if (v1_min[n] > v1[i][n]) v1_min[n] = v1[i][n];
 		}
-		for (int i = 0; i < v2.size(); i++)
+		for (unsigned int i = 0; i < v2.size(); i++)
 		{
 			if (v2_max[n] < v2[i][n]) v2_max[n] = v2[i][n];
 			if (v2_min[n] > v2[i][n]) v2_min[n] = v2[i][n];
@@ -149,7 +149,8 @@ double evaluate::indicator_MS(vector<vector<double>> v1, vector<vector<double>> 
 double evaluate::indicator_hvd(vector<vector<double>>vd, int gen,string instances,int nt){
 	int size1 = vd.size();
 	int size2 = vd[0].size();
-	if(instances=="FDA4" || instances=="FDA5" ||instances=="DMOPD"){
+		if(instances=="FDA4" || instances=="FDA5" ||instances=="DMOPD" || instances=="DF10"
+				 || instances=="DF11"||instances=="DF12" || instances=="DF13" ||instances=="DF14"){
 		probreference.resize(3);
 		probreference[0]=-1;probreference[1]=-1;probreference[2]=-1;
 	}else{
@@ -204,7 +205,7 @@ double evaluate::main_hv(vector<vector<double>> vd)
 	{
 		double slice=fabs(probreference[0]-vd[0][0]);
 		hvs += slice*area_sum(vd,0);
-		for(int i=1;i<vd.size();i++){
+		for(unsigned int i=1;i<vd.size();i++){
 			hvs += area_sum(vd,i)*fabs(vd[i][0]-vd[i-1][0]);
 		}
 	}
@@ -360,9 +361,9 @@ void evaluate::frontcheck(vector<vector<double>>&vd)
 {
 	vector<vector<double>> temp;
 	int flg;
-	for(int i=0;i<vd.size();i++){
+	for(unsigned int i=0;i<vd.size();i++){
 		flg=1;
-		for(int j=0;j<vd.size();j++){
+		for(unsigned int j=0;j<vd.size();j++){
 			int dominate=dominates(0,vd[i],vd[j]);
 			if(dominate==-1)
 			{
@@ -529,10 +530,10 @@ double evaluate::JY_area(double x,double A,double W){
 double evaluate::indicator_GD(){
 	distance=0.0;
 
-	for(int i=0; i<p.size(); i++)
+	for(unsigned int i=0; i<p.size(); i++)
 	{
 		double min_d = 1.0e+10;
-		for(int j=0; j<pf.size(); j++)
+		for(unsigned int j=0; j<pf.size(); j++)
 		{
 			double d = dist_vector(p[i], pf[j]);
 			if(d<min_d)  min_d = d;
@@ -547,10 +548,10 @@ double evaluate::indicator_GD(){
 double evaluate::indicator_IGD()
 {
 	distance=0.0;
-	for(int i=0; i<pf.size(); i++)
+	for(unsigned int i=0; i<pf.size(); i++)
 	{
 		double min_d = 1.0e+10;
-		for(int j=0; j<p.size(); j++)
+		for(unsigned int j=0; j<p.size(); j++)
 		{
 			double d = dist_vector(pf[i], p[j]);
 			if(d<min_d)  min_d = d;
@@ -703,7 +704,7 @@ void evaluate::GetAvgIGD(char * problem,int run,int predict){
 	pf.open(avgIGD,ios::trunc);
 
 
-	for(int ccc=1;ccc<=run;ccc++){//样本均值	
+	for(int ccc=0;ccc<run;ccc++){//样本均值	
 		sprintf(strTest,"evaluate/data/%s_%d.dat",problem,ccc);
 		vector <double>  igds;
 		loadIGD(strTest,igds,4);
@@ -753,7 +754,7 @@ void evaluate::Statistics(char * problem[],int testNumber,int metrics,int precis
 
 //取点
 void evaluate::getPOF(char * problem, int nt,int gen,vector< vector<double>> &pf){
-	char  filename[1024];
+
 	double x = 0 ; // 精度
 	double t = 0;
 	t = (double)(gen-1)/nt;
@@ -909,6 +910,172 @@ void evaluate::getPOF(char * problem, int nt,int gen,vector< vector<double>> &pf
 
 		}else if(problem == "JY10"){
 		
+		}else if(problem == "DF1"){
+			double Ht = 0.75*sin(0.5*PI*t) + 1.25;
+			data.push_back(x);
+			data.push_back(1-pow(x , Ht));
+		}else if(problem == "DF2"){			
+			data.push_back(x);
+			data.push_back(1-sqrt(x));
+		}else if(problem == "DF3"){	
+			double Ht = sin(0.5*PI*t) + 1.5;
+			data.push_back(x);
+			data.push_back(1-pow(x , Ht));
+		}else if(problem == "DF5"){
+			double wt = 0;
+			wt=floor(10*sin(0.5*PI*t));
+			data.push_back(x+0.02*sin(wt*PI*x));
+			data.push_back(1-x+0.02*sin(wt*PI*x));
+		}else if(problem == "DF6"){
+			double alphf;		
+			alphf = 0.2 + 2.8*fabs(sin(0.5*PI*t));
+
+			data.push_back(pow((x + 0.1*sin(3*PI*x)),alphf));
+			data.push_back(pow((1 - x + 0.1*sin(3*PI*x)),alphf));
+		}else if(problem == "DF8"){	
+			double alphf;		
+			alphf = 2.25 + 2*cos(2*PI*t);
+
+			data.push_back(x + 0.1*sin(3*PI*x));
+			data.push_back(pow((1 - x + 0.1*sin(3*PI*x)),alphf));
+		}else if(problem == "DF9"){	
+			double max = 0, Nt = 0;		
+			Nt = 1 + floor(10*abs(sin(0.5*PI*t)));
+			max = (1/(2.0*Nt)+0.1)*sin(2*Nt*PI*x);
+
+			if(max<0)
+				max=0;
+			data.push_back(x + max);
+			data.push_back(1 - x + max);
+		}else if(problem == "DF10"){
+			int i = 0,j = 0;
+			double Ht = 0;
+			Ht = 2.25 + 2*cos(0.5*PI*t);
+			for(i=0;i<100;i++){
+				for(j=0;j<100;j++){
+					double x1 = (double)i/99;
+					double x2 = (double)j/99;
+					data.push_back(pow(sin(0.5*PI*x1),Ht));
+					data.push_back(pow(sin(0.5*PI*x2)*cos(0.5*PI*x1),Ht));
+					data.push_back(pow(cos(0.5*PI*x2)*cos(0.5*PI*x1),Ht));
+					pf.push_back(data);
+					data.clear();
+					if(i == 99)break;
+				}
+			}
+			return;
+		}else if(problem == "DF11"){
+			int i = 0,j = 0;
+			double  Gt = 0 ; 
+			double x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+			
+			Gt = abs(sin(0.5*PI*t));
+			
+			for(i=0;i<100;i++){
+				for(j=0;j<100;j++){
+					x1 = (double)i/99;
+					x2 = (double)j/99;
+					y1 = PI*Gt/6.0 + (PI/2.0 - PI*Gt/3.0)*x1;
+					y2 = PI*Gt/6.0 + (PI/2.0 - PI*Gt/3.0)*x2;
+
+					data.push_back((1+Gt)*(sin(y1)));
+					data.push_back((1+Gt)*(sin(y2)*cos(y1)));
+					data.push_back((1+Gt)*(cos(y2)*cos(y1)));
+					pf.push_back(data);
+					data.clear();
+					if( abs(cos(y1)) <= 1e-10)break;
+				}
+			}
+			return;
+		}else if(problem == "DF12"){
+			int i = 0,j = 0;
+			double  gx = 0 ; 
+			double x1 = 0, x2 = 0;
+			int Kt=0, r=0;
+
+			Kt = floor(10*sin(PI*t));
+			r = 1 - (Kt - (Kt/2)*2);
+	
+			for(i = 0;i<100;i++){
+				for(j = 0;j<100;j++){
+					x1 = (double)i/99;
+					x2 = (double)j/99;
+					gx = abs( sin(floor(Kt*(2*x1 - r))*PI/2.0 ) * sin(floor(Kt*(2*x2 - r))*PI/2.0 ) );
+			
+					data.push_back((1+gx)*(cos(0.5*PI*x1)*cos(0.5*PI*x2)));
+					data.push_back((1+gx)*(cos(0.5*PI*x1)*sin(0.5*PI*x2)));
+					data.push_back((1+gx)*(sin(0.5*PI*x1)));
+					pf.push_back(data);
+					data.clear();
+					if(i == 99)break;
+				}
+			}
+			return;
+		}else if(problem == "DF13"){
+			int i = 0,j = 0 ,pt;			
+			double x1 = 0, x2 = 0;
+			
+			pt = floor( 6 * sin(0.5 *PI*t) );
+
+			for(i=0;i<100;i++){
+				for(j=0;j<100;j++){
+					x1 = (double)i/99;
+					x2 = (double)j/99;
+					
+					data.push_back(cos(0.5*PI*x1)*cos(0.5*PI*x1));
+					data.push_back(cos(0.5*PI*x2)*cos(0.5*PI*x2));
+					data.push_back(sin(0.5*PI*x1)*sin(0.5*PI*x1) + sin(0.5*PI*x1)*cos(pt*PI*x1)*cos(pt*PI*x1)
+						+sin(0.5*PI*x2)*sin(0.5*PI*x2) + sin(0.5*PI*x2)*cos(pt*PI*x2)*cos(pt*PI*x2));
+					pf.push_back(data);
+					data.clear();
+				}
+			}
+			return;
+		}else if(problem == "DF14"){
+			int i = 0,j = 0 ;			
+			double x1 = 0, x2 = 0, y1 = 0;
+			
+			for(i=0;i<100;i++){
+				for(j=0;j<100;j++){
+					x1 = (double)i/99;
+					x2 = (double)j/99;
+					y1 = 0.5 + sin(0.5*PI*t)*(x1-0.5) ;
+
+					data.push_back( 1 - y1 + 0.05*sin(6*PI*y1) );
+					data.push_back( (1 - x2 + 0.05*sin(6*PI*x2)) * (y1 + 0.05*sin(6*PI*y1)) );
+					data.push_back((x2 + 0.05*sin(6*PI*x2)) * (y1 + 0.05*sin(6*PI*y1) ));
+					pf.push_back(data);
+					data.clear();
+				}
+			}
+			return;
+		}else if(problem == "DF4"){
+			double a = 0, b = 0, Ht = 0, f1 = 0, f2 = 0, f3 = 0;
+			
+			for (int gen = 0; gen <500; gen++){
+
+				a = sin(0.5*PI*t);
+				b = 1 + abs(cos(0.5*PI*t));
+				Ht = 1.5 + a;
+				f1 = (pow(b,Ht)*gen)/499.0;
+				data.push_back(f1);
+				data.push_back(b - pow(f1,1.0/Ht));				
+				pf.push_back(data);
+				data.clear();
+			}
+			return;
+		}else if(problem == "DF7"){
+			double a = 0, b = 0, Ht = 0, f1 = 0, f2 = 0, f3 = 0;
+			vector<double> data;
+			for (int gen = 0; gen <500; gen++){
+				
+				f1 = (1+t)/(1+(3.0*gen)/499.0);
+				data.push_back(f1);
+				data.push_back(1.0/f1);	
+				pf.push_back(data);
+				data.clear();
+			}
+			return;
 		}
 		pf.push_back(data);
 		x+=0.001;
@@ -943,7 +1110,7 @@ void evaluate::nodominate(vector< vector<double>> &pf){
 int evaluate::Dominate(vector<double>index1,vector<double>index2)
 {
 	int better = 0, wbetter = 0, worse = 0, wworse = 0;
-	for(int i=0; i<index1.size(); i++)
+	for(unsigned int i=0; i<index1.size(); i++)
 	{
 		if(	index1[i] <= index2[i])
 		{

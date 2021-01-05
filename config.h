@@ -5,15 +5,17 @@
 
 using namespace std;
 
-//enum probName{FDA0, FDA1, FDA2, FDA3, FDA4, FDA5, dMOP1, dMOP2, dMOP3, ZJZ1,ZJZ2,ZJZ3,ZJZ4,ZJZ5,ZJZ6,UDF1,UDF2,UDF3,UDF4,UDF5,UDF6,UDF7};
-//enum dominationTypes{DOMINATES,DOMINATED,EQUIVALENT, NONCOMPARABLE};//used when comparing two solutions for domination.
-//enum graphTypes {AVG_HYPERVOLUME, MEDIAN_ATTAINMENT,ALL_ATTAINMENT_FRONTS,AVGHYP_COLS,ALL_AF_NN,AMALG_AF,NDS_ALLCHANGES};  
-//
-//int nt = 1;  //环境变化强度
-//int taut = 1;
-
 vector<double> probreference;
 
-
+int nt=10;//环境变化强度
+int run=5;    //独立运行次数
+int predict=100; //预测代数
+int metrics=5; //指标数
+int testNumber=14;//测试函数个数
+int precise = 3;  //精确度
+//char* instances[]  = {"FDA1","FDA2","FDA3","FDA4","DMOP1","DMOP2","DMOP3","DMOPA","DMOPB","DMOPC","DMOPD","DMOPE","JY1","JY2","JY3","JY4","JY5","JY6","JY7","JY8","JY9","FDA4","DMOPF"}; // names of test instances
+	
+//char* instances[]  = {"FDA1","FDA2","FDA3","FDA4","FDA5","DMOP1","DMOP2","DMOP3","JY1","JY2","JY3","JY4","JY5","JY6","JY7","JY8","JY9"}; // names of test instances
+char* instances[]  = {"DF1","DF2","DF3","DF4","DF5","DF6","DF7","DF8","DF9","DF10","DF11","DF12","DF13","DF14"};
 
 #endif // !CONFIG_H
